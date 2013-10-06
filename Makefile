@@ -4,10 +4,14 @@ reports: data notebooks
 	rm -rf reports;
 	mkdir reports;
 	cd notebooks; for NOTEBOOK in *.ipynb; do \
-		echo "$$NOTEBOOK"; \
+		BASENAME=`basename $$NOTEBOOK`; \
+		echo "$$BASENAME"; \
+		./recompute-notebook.py "$$NOTEBOOK" "../reports/$$BASENAME"; \
+		cd ../reports; \
 		ipython nbconvert --to html "$$NOTEBOOK"; \
-	done; \
-	mv *.html ../reports;
+		cd -; \
+		rm -rf ../reports/$$BASENAME; \
+	done;\
 
 data:
 	echo $(SSH_CONNECTION); \
