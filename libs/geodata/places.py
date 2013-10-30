@@ -51,7 +51,7 @@ class Places:
                 continue
             fields = item['fields']
             data.append({
-                'id'   : fields['pk'],
+                'id'   : item['pk'],
                 'name' : fields['name'].encode('utf8'),
                 'type' : fields['type'],
                 'code' : fields['code']})
