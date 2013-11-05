@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import numpy as np
 import pandas as pd
+import math
 from pprint import pprint
 
 
@@ -145,6 +146,14 @@ class MapAnalysis(GeneralAnalysis):
             places_dataframe = self.places,
             answers_dataframe = answers)
 
+    def difficulties(self, model, out_svg):
+        difficulties = model.difficulties(self.places)
+        self._save(
+            difficulties,
+            self._config_world(),
+            out_svg,
+            out_svg + ".css")
+
     def success_probability(self, out_svg):
         data = []
         for place in self.answers['place.asked'].unique():
@@ -163,7 +172,16 @@ class MapAnalysis(GeneralAnalysis):
 
     # data - code, ratio
     def _save(self, data, config, out_svg, out_css):
-        self._create_css(data, out_css)
+        write_data = data
+        r_max = data['ratio'].max()
+        r_min = data['ratio'].min()
+        if r_min != r_max:
+            write_data['ratio'] = data['ratio'].map(
+                lambda x: (x - r_min) / (r_max - r_min))
+        else:
+            write_data['ratio'] = data['ratio'].map(
+                lambda x: 0.5)
+        self._create_css(write_data, out_css)
         css = open(out_css)
         self.kartograph.generate(
             config,
@@ -180,18 +198,22 @@ class MapAnalysis(GeneralAnalysis):
     def _create_css(self, data, filename):
         try:
             file = open(filename, 'w')
+            r_median = data['ratio'].median()
             for i, row in data.iterrows():
                 code = row['code'].upper()
                 ratio = row['ratio']
-                file.write('.states[iso_a2=' + code + '] { fill: ' + self._color_rgspectrum(ratio) + '; }\n')
+                file.write('.states[iso_a2=' + code + '] { fill: ' + self._color_rgspectrum(ratio, r_median) + '; }\n')
             file.close()
         finally:
             pass
 
-    def _color_rgspectrum(self, val): # val 0..1
+    def _color_rgspectrum(self, val, median = 0.5): # val 0..1
         if val < 0 or val > 1:
-            raise Exception("The value has to be from [0,1] interval.")
-        val = 1 - (1-val)*2
+            raise Exceptiion("The value has to be from [0,1] interval.")
+        if median > 0.7:
+            val = val ** 2
+        elif median < 0.3:
+            val = math.sqrt(val)
         r = int(255 * val)
         g = int(255 * val)
         b = int(255 * val)

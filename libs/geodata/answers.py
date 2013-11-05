@@ -82,23 +82,6 @@ class Answers:
         return Answers.from_dataframe(
             self.data[self.data["place.asked"] != self.data["place.answered"]])
 
-    def simulate(self, simulator, status = False, n = None):
-        data = self.data.sort(["inserted"])
-        progress_before = None
-        index = 0
-        if n == None or n > len(data):
-            n = len(data)
-        for i, row in data.iterrows():
-            simulator.answer(row.to_dict())
-            if status:
-                progress = int(round(100 * float(index) / n))
-                if progress_before == None or progress_before != progress:
-                    progress_before = progress
-                    print "[" + progress * "*" + (100 - progress) * "-" + "]", index, "/", n
-            index += 1
-            if index >= n:
-                return
-
     def _init_data_from_json(self, filename):
         try:
             file = open(filename)
@@ -175,75 +158,3 @@ class Answers:
             previous_place = row["place.asked"]
             previous_user = row["user"]
         return result
-
-
-class Simulator:
-
-    def __init__(self):
-        self.errors = []
-        self.predictions = {}
-        self.answered = pd.DataFrame()
-
-    def longest(self):
-        max_user  = None
-        max_place = None
-        for user in self.predictions.keys():
-            max = None
-            for place in self.predictions[user].keys():
-                if max == None or len(self.predictions[user][place]) > max:
-                    max = place
-            if max_user == None or len(self.predictions[user][max]) > len(self.predictions[max_user][max_place]):
-                max_user = user
-                max_place = max
-        data = self.answered
-        data = data[data['user'] == max_user]
-        data = data[data['place.asked'] == max_place]
-        return SimulatedTrace(self.predictions[max_user][max_place], data)
-
-    def avg(self, user = None, place = None):
-        data = self.answered
-        if len(data) == 0:
-            return None
-        if user != None:
-            data = data[data['user'] == user]
-            if len(data) == 0:
-                return None
-        if place != None:
-            data = data[data['place.asked'] == place]
-            if len(data) == 0:
-                return None
-        return sum(data['place.asked'] == data['place.answered']) / float(len(data))
-
-    def rmse(self):
-        return math.sqrt(sum(self.errors)/len(self.errors))
-
-    def predict(self, answer):
-        pass
-
-    def save(self, answer):
-        pass
-
-    def answer(self, answer):
-        prediction = self.predict(answer)
-        self.save(answer)
-        if answer['place.asked'] == answer['place.answered']:
-            real = 1
-        else:
-            real = 0
-        if not self.predictions.has_key(answer['user']):
-            self.predictions[answer['user']] = {}
-        if not self.predictions[answer['user']].has_key(answer['place.asked']):
-            self.predictions[answer['user']][answer['place.asked']] = []
-        self.predictions[answer['user']][answer['place.asked']].append(prediction)
-        self.answered = self.answered.append(pd.DataFrame([answer]))
-        self.errors.append((real - prediction)**2)
-
-
-class SimulatedTrace:
-
-    def __init__(self, predicted, answered):
-        self.predicted = predicted
-        self.answered = answered
-
-    def rmse(self):
-        return ((self.answered['place.asked'] == self.answered['place.answered']) - self.predicted) ** 2
