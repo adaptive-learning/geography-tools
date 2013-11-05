@@ -1,5 +1,7 @@
 SSH_CONNECTION=51bb5930500446923f000201@geography-conqueror.rhcloud.com
 
+.PHONY: target/reports target/maps
+
 target/download:
 	mkdir -p target/download; \
 	cd target/download; \
@@ -27,13 +29,20 @@ target/data: target/download
 	done
 
 target/reports: target/data notebooks/* libs/geodata/*
-	mkdir -p target/reports;
+	mkdir -p target/reports; \
 	cd notebooks; for NOTEBOOK in *.ipynb; do \
 		BASENAME=`basename $$NOTEBOOK .ipynb`; \
 		echo "$$BASENAME"; \
 		runipy $$NOTEBOOK -q --pylab --html ../target/reports/$$BASENAME.html; \
 	done;\
 
-publish: reports
+target/maps:
+	mkdir -p target/maps; \
+	cd scripts; for SCRIPT in *.py; do \
+		python "$$SCRIPT"; \
+	done;
+
+publish: target/reports target/maps
 	ssh jpapouse@zimodej.cz -t "rm -rf /var/www/zimodej.cz/subdomeny/geodata/ && mkdir /var/www/zimodej.cz/subdomeny/geodata/ && (echo 'Options +Indexes' > /var/www/zimodej.cz/subdomeny/geodata/.htaccess)"; \
-	scp reports/*.html jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata
+	scp target/reports/*.html jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
+	scp target/maps/*.svg jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;

@@ -7,10 +7,32 @@ import pandas as pd
 from pprint import pprint
 
 
-class PlotAnalysis:
+class GeneralAnalysis:
 
-    def __init__(self, filename_csv):
-        self.answers = Answers.from_csv(filename_csv)
+    def __init__(self, filename_csv = None, answers = None):
+        if filename_csv:
+            self.answers = Answers.from_csv(filename_csv)
+        elif answers:
+            self.answers = answers
+        else:
+            raise Exception("Can't create a new analysis object.")
+
+    def __getitem__(self, key):
+        if np.isscalar(key):
+            return self.answers[key]
+        else:
+            return self.new_from_answers(self.answers[key])
+
+    def __setitem__(self, key, value):
+        self.answers[key] = value
+
+    def new_from_answers(self, answers):
+        raise Exception("Method 'new_from_answers should be overriden.")
+
+class PlotAnalysis(GeneralAnalysis):
+
+    def __init__(self, filename_csv = None, answers = None):
+        GeneralAnalysis.__init__(self, filename_csv, answers)
 
     def plot_time_hist(self, correct = True):
         xmax = max(
@@ -71,10 +93,12 @@ class PlotAnalysis:
                     label = labels[i])
 
     def _get_pattern_times(self, pattern, normalize = None):
-        data = self.answers.sort(['place.asked', 'inserted'])
+        data = self.answers
+        data = data.sort(['place.asked', 'inserted'])
         data['response.time'] = np.log(data['response.time'])
         if normalize != None:
             data.normalize_response_time(normalize, inplace = True)
+        data = data.data
         result = []
         for i in pattern:
             result.append(pd.DataFrame())
@@ -99,14 +123,27 @@ class PlotAnalysis:
                     result[i] = result[i].append(pd.DataFrame([search[i].to_dict()]))
         return result
 
+    def new_from_answers(self, answers):
+        return PlotAnalysis(answers = answers)
 
-class MapAnalysis:
 
-    def __init__(self, kartograph, answers_csv, places_csv, shapefile):
-        self.answers = Answers.from_csv(answers_csv)
-        self.places = Places.from_csv(places_csv)
+class MapAnalysis(GeneralAnalysis):
+
+    def __init__(self, kartograph, shapefile, places_csv = None, places_dataframe = None, answers_csv = None, answers_dataframe = None):
+        GeneralAnalysis.__init__(self, answers_csv, answers_dataframe)
+        if places_csv:
+            self.places = Places.from_csv(places_csv)
+        else:
+            self.places = places_dataframe
         self.shapefile = shapefile
         self.kartograph = kartograph
+
+    def new_from_answers(self, answers):
+        return MapAnalysis(
+            kartograph = self.kartograph,
+            shapefile = self.shapefile,
+            places_dataframe = self.places,
+            answers_dataframe = answers)
 
     def success_probability(self, out_svg):
         data = []
@@ -133,13 +170,11 @@ class MapAnalysis:
             outfile = out_svg,
             stylesheet = css.read())
 
-    def _config_world(self, filter = None):
+    def _config_world(self):
         layer = {
             'src'   : self.shapefile,
             'class' : 'states'
         }
-        if filter:
-            layer['filter'] = filter
         return {'layers' : [layer]}
 
     def _create_css(self, data, filename):
@@ -161,3 +196,4 @@ class MapAnalysis:
         g = int(255 * val)
         b = int(255 * val)
         return "'rgb("+`r`+','+`g`+','+`b`+")'"
+

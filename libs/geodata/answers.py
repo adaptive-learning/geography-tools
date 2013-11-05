@@ -9,14 +9,12 @@ import matplotlib.pyplot as plt
 class Answers:
 
     def __init__(self, json = None, csv = None, dataframe = None):
-        if json != None:
+        if json:
             self.data = self._init_data_from_json(json)
-        elif csv != None:
+        elif csv:
             self.data = pd.DataFrame.from_csv(csv)
-        elif dataframe != None:
-            self.data = dataframe
         else:
-            raise Exception("There is no way how to build a new instance.")
+            self.data = dataframe
 
     @classmethod
     def from_json(cls, filename):
@@ -31,10 +29,16 @@ class Answers:
         return Answers(dataframe = dataframe)
 
     def __getitem__(self, key):
-        return self.data[key]
+        if np.isscalar(key):
+            return self.data[key]
+        else:
+            return Answers(dataframe = self.data[key])
 
     def __setitem__(self, key, value):
         self.data[key] = value
+
+    def __len__(self):
+        return len(self.data)
 
     def sort(self, columns = None, column = None, axis = 0, ascending = True,
              inplace = False):
@@ -61,7 +65,7 @@ class Answers:
         result = pd.DataFrame()
         for key in self.data[column].unique():
             key_data = self.data[self.data[column] == key]
-            mean = key_data['response.time'].mean();
+            mean = key_data['response.time'].mean()
             key_data['response.time'] = key_data['response.time'] - mean
             result = result.append(key_data)
         if inplace:
@@ -120,7 +124,8 @@ class Answers:
                 "place.answered" : [answer],
                 "user"           : [fields["user"]],
                 "options.number" : [len(fields["options"])],
-                "inserted"       : [inserted]})
+                "inserted"       : [inserted],
+                "type"           : [fields["type"]]})
             data = data.append(new_row)
         return data
 
