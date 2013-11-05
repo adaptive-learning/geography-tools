@@ -18,9 +18,10 @@ class ConstantModel(Model):
 
 class  HierarchicalElo(Model):
 
-    def __init__(self, alpha1 = 0.4, alpha2 = 1.7):
+    def __init__(self, alpha1 = 0.4, alpha2 = 1.7, alpha3 = 0):
         self.alpha1 = alpha1
         self.alpha2 = alpha2
+        self.alpha3 = alpha3
         self.G = {} # global user's skill
         self.D = {} # global difficulty of place
         self.K = {} # user's skil and difficulty of place combined together
@@ -38,6 +39,13 @@ class  HierarchicalElo(Model):
             self.G[user] = self.G.get(user, 0) + self.alpha1 * diff
             self.D[place] = self.D.get(place, 0) - self.alpha1 * diff
         self.K[user, place] = self.K.get((user, place), 0) + self.alpha2 * diff
+        if not correct:
+            place_conf = answer['place.answered']
+            diff_conf = - self.sigmoid_shift(
+                self.K.get((user, place_conf), 0),
+                self.random_factor(answer['type'])
+            )
+            self.K[user, place_conf] = self.K.get((user, place_conf), 0) + self.alpha3 * diff_conf
 
     def predict(self, answer):
         user = answer['user']
@@ -60,4 +68,4 @@ class  HierarchicalElo(Model):
         return pd.DataFrame(result)
 
     def __str__(self):
-        return "Hierarchical ELO [alpha1=" + str(self.alpha1) + ", alpha2=" + str(self.alpha2) + "]"
+        return "Hierarchical ELO [alpha1=" + str(self.alpha1) + ", alpha2=" + str(self.alpha2) + ", alpha3=" + str(self.alpha3) + "]"
