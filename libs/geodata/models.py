@@ -18,7 +18,7 @@ class ConstantModel(Model):
 
 class  HierarchicalElo(Model):
 
-    def __init__(self, alpha1 = 0.05, alpha2 = 0.1):
+    def __init__(self, alpha1 = 0.4, alpha2 = 1.7):
         self.alpha1 = alpha1
         self.alpha2 = alpha2
         self.G = {} # global user's skill
@@ -28,7 +28,7 @@ class  HierarchicalElo(Model):
     def save(self, answer):
         user = answer['user']
         place = answer['place.asked']
-        correct = answer['place.asked'] != answer['place.answered']
+        correct = answer['place.asked'] == answer['place.answered']
         # first attempt
         if answer['question.number.all'] == 0:
             self.K[user, place] = self.G.get(user, 0) - self.D.get(place, 0)
@@ -55,7 +55,7 @@ class  HierarchicalElo(Model):
                 continue
             result.append({
                 'code': place['code'],
-                'ratio': self.D[place['id']]
+                'ratio': - self.D[place['id']]
             })
         return pd.DataFrame(result)
 

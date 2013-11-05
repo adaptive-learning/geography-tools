@@ -22,9 +22,11 @@ analysis[analysis['type'] == 10].success_probability(
 
 simulator = geodata.Simulator(answers)
 hierarchical_elo = geodata.HierarchicalElo()
-baseline = geodata.ConstantModel(1)
+baseline1 = geodata.ConstantModel(1)
+baseline0 = geodata.ConstantModel(0)
 simulated = simulator.simulate(hierarchical_elo)
-print simulator.simulate(baseline)
+print simulator.simulate(baseline0)
+print simulator.simulate(baseline1)
 print simulated
 analysis.difficulties(
     simulated.model,

@@ -5,18 +5,18 @@ class Simulator:
 
     def __init__(self, answers):
         self.answers = answers
-        self.predicted = []
-        self.answered = []
 
     def simulate(self, model, status = False, n = None):
+        predicted = []
+        answered = []
         data = self.answers.sort(["inserted"]).data
         progress_before = None
         index = 0
         if n == None or n > len(data):
             n = len(data)
         for i, row in data.iterrows():
-            self.predicted.append(model.predict(row.to_dict()))
-            self.answered.append(row['place.asked'] == row['place.answered'])
+            predicted.append(model.predict(row.to_dict()))
+            answered.append(row['place.asked'] == row['place.answered'])
             model.save(row.to_dict())
 
             if status:
@@ -27,7 +27,7 @@ class Simulator:
             index += 1
             if index >= n:
                 break
-        return SimulationResult(model, self.predicted, self.answered)
+        return SimulationResult(model, predicted, answered)
 
 
 class Model:

@@ -33,7 +33,7 @@ class Places:
         self.data[key] = value
 
     def to_csv(self, filename):
-        self.data.to_csv(filename)
+        self.data.to_csv(filename, index = False)
 
     def _init_data_from_json(self, filename):
         try:

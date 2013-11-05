@@ -59,7 +59,7 @@ class Answers:
             return Answers.from_dataframe(sorted_data)
 
     def to_csv(self, filename):
-        self.data.to_csv(filename)
+        self.data.to_csv(filename, index = False)
 
     def normalize_response_time(self, column, inplace = False):
         result = pd.DataFrame()
