@@ -12,7 +12,8 @@ class Answers:
         if json:
             self.data = self._init_data_from_json(json)
         elif csv:
-            self.data = pd.DataFrame.from_csv(csv)
+            self.data = pd.DataFrame.from_csv(csv, index_col = False)
+            self.data.index = range(len(self.data))
         else:
             self.data = dataframe
 

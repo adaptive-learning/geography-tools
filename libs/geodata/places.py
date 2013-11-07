@@ -8,7 +8,8 @@ class Places:
         if json != None:
             self.data = self._init_data_from_json(json)
         elif csv != None:
-            self.data = pd.DataFrame.from_csv(csv)
+            self.data = pd.DataFrame.from_csv(csv, index_col = False)
+            self.data.index = range(len(self.data))
         elif dataframe != None:
             self.data = dataframe
         else:
