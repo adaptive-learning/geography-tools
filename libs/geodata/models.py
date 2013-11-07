@@ -52,7 +52,7 @@ class  HierarchicalElo(Model):
         place = answer['place.asked']
         type = answer['type']
         return self.sigmoid_shift(
-            self.K.get((user,place), 0),
+            self.K.get((user,place), self.G.get(user, 0) - self.D.get(place, 0)),
             self.random_factor(type)
         )
 
