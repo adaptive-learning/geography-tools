@@ -36,11 +36,22 @@ target/reports: target/data notebooks/* libs/geodata/*
 		runipy $$NOTEBOOK -q --pylab --html ../target/reports/$$BASENAME.html; \
 	done;\
 
-target/maps:
+target/maps: scripts/*
 	mkdir -p target/maps; \
 	cd scripts; for SCRIPT in *.py; do \
 		python "$$SCRIPT"; \
 	done;
+
+target/video:
+	mkdir -p target/video; \
+	for DIR in target/maps/dynamic/*; do \
+		VIDEO_NAME=`basename $$DIR`; \
+		mkdir -p "target/video/$$VIDEO_NAME"; \
+		for FILE in $$DIR/*.svg; do \
+			FILE_BASE=`basename "$$FILE" .svg`; \
+			convert -density 1200 -resize 1600x900 "$$FILE" "target/video/$$VIDEO_NAME/$$FILE_BASE.png"; \
+		done; \
+	done
 
 publish: target/reports target/maps
 	ssh jpapouse@zimodej.cz -t "rm -rf /var/www/zimodej.cz/subdomeny/geodata/ && mkdir /var/www/zimodej.cz/subdomeny/geodata/ && (echo 'Options +Indexes' > /var/www/zimodej.cz/subdomeny/geodata/.htaccess)"; \

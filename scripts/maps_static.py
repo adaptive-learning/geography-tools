@@ -10,10 +10,11 @@ import kartograph
 answers = geodata.Answers.from_csv('../target/data/answers.csv')
 places = geodata.Places.from_csv('../target/data/places.csv')
 
+
 analysis = geodata.MapAnalysis(
     kartograph = kartograph.Kartograph(),
-    answers_dataframe = answers,
-    places_dataframe = places,
+    answers = answers,
+    places = places,
     shapefile = '../target/data/world.shp')
 
 analysis.success_probability('../target/maps/success_prob_all.svg')
@@ -28,6 +29,6 @@ simulated = simulator.simulate(hierarchical_elo)
 print simulator.simulate(baseline0)
 print simulator.simulate(baseline1)
 print simulated
-analysis.difficulties(
+analysis.difficulties_from_model(
     simulated.model,
     '../target/maps/hierarchical_elo_difficulties.svg')
