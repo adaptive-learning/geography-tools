@@ -36,9 +36,9 @@ target/reports: target/data notebooks/* libs/geodata/*
 		runipy $$NOTEBOOK -q --pylab --html ../target/reports/$$BASENAME.html; \
 	done;\
 
-target/maps: scripts/*
+target/maps: scripts/maps_*.py
 	mkdir -p target/maps; \
-	cd scripts; for SCRIPT in *.py; do \
+	cd scripts; for SCRIPT in maps_*.py; do \
 		python "$$SCRIPT"; \
 	done;
 
