@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from pprint import pprint
+from sklearn.metrics import auc, roc_curve
 import pandas as pd
 
 
@@ -119,11 +120,17 @@ class SimulationResult:
 
     def rmse(self):
         return math.sqrt(
-            sum((self.predicted - self.answered) ** 2)
-            /
-            float(len(self.predicted))
+            np.mean((self.predicted - self.answered) ** 2)
         )
 
+    def mae(self):
+        return np.mean(np.absolute(
+            np.array(self.answered) - np.array(self.predicted)))
+
+    def auc(self):
+        fpr, tpr, thresholds = roc_curve(self.answered, self.predicted)
+        return auc(fpr, tpr)
+
     def __str__(self):
-        return str(self.model) + ", RMSE: " + str(self.rmse())
+        return str(self.model) + ", RMSE: " + str(self.rmse()) + ", AUC: " + str(self.auc()) + ", MAE: " + str(self.mae())
 

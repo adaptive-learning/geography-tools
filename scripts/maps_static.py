@@ -25,9 +25,13 @@ simulator = geodata.Simulator(answers)
 hierarchical_elo = geodata.HierarchicalElo()
 baseline1 = geodata.ConstantModel(1)
 baseline0 = geodata.ConstantModel(0)
+user_mean = geodata.UserMeanModel()
+global_mean = geodata.GlobalMeanModel()
 simulated = simulator.simulate(hierarchical_elo)
 print simulator.simulate(baseline0)
 print simulator.simulate(baseline1)
+print simulator.simulate(user_mean)
+print simulator.simulate(global_mean)
 print simulated
 analysis.difficulties_from_model(
     simulated.model,

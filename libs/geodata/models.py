@@ -1,5 +1,6 @@
 from geodata import Model
 import pandas as pd
+import numpy as np
 
 
 class ConstantModel(Model):
@@ -15,6 +16,39 @@ class ConstantModel(Model):
 
     def __str__(self):
         return "Constant (" + str(self.prediction) + ")"
+
+class GlobalMeanModel(Model):
+
+    def __init__(self):
+        self.answered = []
+
+    def save(self, answer):
+        self.answered.append(answer['place.asked'] == answer['place.answered'])
+
+    def predict(self, answer):
+        return np.mean(self.answered) if len(self.answered) > 0 else 0.5
+
+    def __str__(self):
+        return "Global Average"
+
+class UserMeanModel(Model):
+
+    def __init__(self):
+        self.answered = {}
+
+    def save(self, answer):
+        if not self.answered.has_key(answer['user']):
+            self.answered[answer['user']] = []
+        self.answered[answer['user']].append(
+            answer['place.asked'] == answer['place.answered'])
+
+    def predict(self, answer):
+        answered = self.answered.pop(answer['user'], [])
+        return np.mean(answered) if len(answered) > 0 else 1
+
+    def __str__(self):
+        return "User's Mean"
+
 
 class  HierarchicalElo(Model):
 

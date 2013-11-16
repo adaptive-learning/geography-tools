@@ -6,3 +6,5 @@ from geodata.simulation import Simulator
 from geodata.simulation import Model
 from geodata.models import HierarchicalElo
 from geodata.models import ConstantModel
+from geodata.models import UserMeanModel
+from geodata.models import GlobalMeanModel
