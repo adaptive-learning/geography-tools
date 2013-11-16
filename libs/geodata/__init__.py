@@ -8,3 +8,4 @@ from geodata.models import HierarchicalElo
 from geodata.models import ConstantModel
 from geodata.models import UserMeanModel
 from geodata.models import GlobalMeanModel
+from geodata.experiment import Experiment
