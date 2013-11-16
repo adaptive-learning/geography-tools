@@ -168,7 +168,6 @@ class MapAnalysis(GeneralAnalysis):
         if not os.path.exists(dest_dir_path):
             os.makedirs(dest_dir_path)
         while simulation != None:
-            simulation = simulation.step()
             predictions = model.predictions(self.places, user)
             last_answer = simulation.last_answer
             out_svg = os.path.join(dest_dir_path, "step_" + str(last_answer['inserted']) + ".svg")
@@ -184,6 +183,7 @@ class MapAnalysis(GeneralAnalysis):
                 out_svg + '.css',
                 color_spectrum = self._color_rgspectrum,
                 optional_css = optional_css)
+            simulation = simulation.step()
 
     def success_probability(self, out_svg):
         data = []
