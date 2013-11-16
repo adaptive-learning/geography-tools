@@ -36,24 +36,37 @@ target/reports: target/data notebooks/* libs/geodata/*
 		runipy $$NOTEBOOK -q --pylab --html ../target/reports/$$BASENAME.html; \
 	done;\
 
-target/maps: scripts/maps_*.py
+target/maps: scripts/maps_*.py target/data
 	mkdir -p target/maps; \
 	cd scripts; for SCRIPT in maps_*.py; do \
+		BASENAME=`basename $$SCRIPT .py`; \
+		echo "$$BASENAME"; \
 		python "$$SCRIPT"; \
 	done;
 
-target/video:
+target/optimized: scripts/optimize_*.py target/data
+	mkdir -p target/optimized; \
+	cd scripts; for SCRIPT in optimize_*.py; do \
+		BASENAME=`basename $$SCRIPT .py`; \
+		echo "$$BASENAME"; \
+		(python "$$SCRIPT") > "../target/optimized/$$BASENAME.txt"; \
+	done;
+
+target/video: target/maps
 	mkdir -p target/video; \
 	for DIR in target/maps/dynamic/*; do \
 		VIDEO_NAME=`basename $$DIR`; \
 		mkdir -p "target/video/$$VIDEO_NAME"; \
 		for FILE in $$DIR/*.svg; do \
+			echo "converting $$FILE"; \
 			FILE_BASE=`basename "$$FILE" .svg`; \
 			convert -density 1200 -resize 1600x900 "$$FILE" "target/video/$$VIDEO_NAME/$$FILE_BASE.png"; \
 		done; \
 	done
 
-publish: target/reports target/maps
-	ssh jpapouse@zimodej.cz -t "rm -rf /var/www/zimodej.cz/subdomeny/geodata/ && mkdir /var/www/zimodej.cz/subdomeny/geodata/ && (echo 'Options +Indexes' > /var/www/zimodej.cz/subdomeny/geodata/.htaccess)"; \
-	scp target/reports/*.html jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
-	scp target/maps/*.svg jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
+publish: target/reports target/maps target/optimized target/video
+	ssh jpapouse@zimodej.cz -t "rm -rf /var/www/zimodej.cz/subdomeny/geodata/ && mkdir /var/www/zimodej.cz/subdomeny/geodata/ && (echo 'Options All +Indexes' > /var/www/zimodej.cz/subdomeny/geodata/.htaccess)"; \
+	scp -r target/reports/ jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
+	scp -r target/maps/ jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
+	scp -r target/optimized/ jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
+	scp -r target/video jpapouse@zimodej.cz:/var/www/zimodej.cz/subdomeny/geodata;
