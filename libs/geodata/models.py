@@ -1,6 +1,8 @@
 from geodata import Model
 import pandas as pd
 import numpy as np
+import time
+import math
 
 
 class ConstantModel(Model):
@@ -52,7 +54,7 @@ class UserMeanModel(Model):
 
 class  HierarchicalElo(Model):
 
-    def __init__(self, alpha1 = 0.4, alpha2 = 1.7, alpha3 = 0):
+    def __init__(self, alpha1 = 0.4, alpha2 = 1.6, alpha3 = 0):
         self.alpha1 = alpha1
         self.alpha2 = alpha2
         self.alpha3 = alpha3
@@ -103,3 +105,34 @@ class  HierarchicalElo(Model):
 
     def __str__(self):
         return "Hierarchical ELO [alpha1=" + str(self.alpha1) + ", alpha2=" + str(self.alpha2) + ", alpha3=" + str(self.alpha3) + "]"
+
+
+class HierarchicalEloWithForgetting(HierarchicalElo):
+
+    def __init__(self, alpha1 = 0.4, alpha2 = 1.6, beta = 0.15, alpha3 = 0):
+        HierarchicalElo.__init__(self, alpha1, alpha2, alpha3)
+        self.beta = beta
+        self.last_time = {}
+
+    def save(self, answer):
+        HierarchicalElo.save(self, answer)
+        self.last_time[answer['user'], answer['place.asked']] = self.to_time(answer)
+
+    def predict(self, answer):
+        user = answer['user']
+        place = answer['place.asked']
+        type = answer['type']
+        time_diff = (self.to_time(answer) - self.last_time.get((user, place), self.to_time(answer))) / 3600.0
+        K = self.K.get((user,place), self.G.get(user, 0) - self.D.get(place, 0))
+        K = K - self.beta * (math.log(time_diff) if time_diff > 0 else 0)
+        return self.sigmoid_shift(
+            K,
+            self.random_factor(type)
+        )
+
+    def to_time(self, answer):
+        inserted = time.strptime(answer['inserted'], "%Y-%m-%d %H:%M:%S")
+        return time.mktime(inserted)
+
+    def __str__(self):
+        return "Hierarchical ELO with forgetting [alpha1=" + str(self.alpha1) + ", alpha2=" + str(self.alpha2) + ", alpha3=" + str(self.alpha3) + ", beta=" + str(self.beta)  +  "]"
