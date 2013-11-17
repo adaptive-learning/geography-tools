@@ -68,7 +68,7 @@ class ExperimentResult:
 
     def params(self):
         i = self._rmse.index(min(self._rmse))
-        return self._params(i)
+        return self._params[i]
 
     def __str__(self):
         return ("Experiment results for model " + str(self._model_class) + "\n"
