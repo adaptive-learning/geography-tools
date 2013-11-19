@@ -1,7 +1,7 @@
 import random
 import scipy.optimize as optimize
 import numpy as np
-from geodata import Simulator
+from simulation import Simulator
 
 
 class Experiment:

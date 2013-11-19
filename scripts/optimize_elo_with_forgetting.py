@@ -4,7 +4,7 @@ from pprint import pprint
 sys.path.append('../libs')
 sys.path.append('../target/external-libs/')
 
-import geodata
+import proso.geodata
 import scipy.optimize as optimize
 
 answers = geodata.Answers.from_csv('../target/data/answers.csv')

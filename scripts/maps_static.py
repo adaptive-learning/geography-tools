@@ -4,7 +4,7 @@ from pprint import pprint
 sys.path.append('../libs')
 sys.path.append('../target/external-libs/')
 
-import geodata
+import proso.geodata as geodata
 import kartograph
 
 answers = geodata.Answers.from_csv('../target/data/answers.csv')

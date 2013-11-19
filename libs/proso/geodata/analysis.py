@@ -1,6 +1,7 @@
 import sys
-from geodata import Answers, Places
-import geodata
+from answers import Answers
+from places import Places
+from simulation import Simulator
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 import numpy as np
@@ -159,7 +160,7 @@ class MapAnalysis(GeneralAnalysis):
             out_svg + ".css")
 
     def model_seq_for_user(self, model, user, dest_dir, ratio = 'probability'):
-        simulator = geodata.Simulator(self.answers)
+        simulator = Simulator(self.answers)
         simulator_user = simulator[simulator['user'] == user]
         simulator = simulator[simulator['user'] != user]
         simulator.simulate(model)
@@ -168,6 +169,9 @@ class MapAnalysis(GeneralAnalysis):
         if not os.path.exists(dest_dir_path):
             os.makedirs(dest_dir_path)
         while simulation != None:
+            simulation = simulation.step()
+            if not simulation:
+                continue
             predictions = model.predictions(self.places, user)
             last_answer = simulation.last_answer
             out_svg = os.path.join(dest_dir_path, "step_" + str(last_answer['inserted']) + ".svg")
@@ -183,7 +187,6 @@ class MapAnalysis(GeneralAnalysis):
                 out_svg + '.css',
                 color_spectrum = self._color_rgspectrum,
                 optional_css = optional_css)
-            simulation = simulation.step()
 
     def success_probability(self, out_svg):
         data = []
