@@ -1,12 +1,5 @@
-from answers import Answers
-from places import Places
-from analysis import PlotAnalysis
-from analysis import MapAnalysis
-from simulation import Simulator
-from simulation import Model
-from models import HierarchicalElo
-from models import HierarchicalEloWithForgetting
-from models import ConstantModel
-from models import UserMeanModel
-from models import GlobalMeanModel
-from experiment import Experiment
+# -*- coding: utf-8 -*-
+from plot import answers_per_user as plot_answers_per_user
+from plot import total_answers as plot_total_answers
+from plot import total_success as plot_total_success
+from util import load_csv
