@@ -1,5 +1,30 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
+import sys
+
+
+def confusing_factor_by_distance(cf, distance_matrix, places=None, **args):
+    def sort_key_gen(place):
+        return lambda (p, v): (distance_matrix[place][p], -v)
+
+    confusing_factor(cf, places, sort_key_gen, **args)
+
+
+def confusing_factor(confusing_factor, places=None, sort_key_gen=None, **args):
+    if not places:
+        places = confusing_factor.keys()
+    normalized = {}
+    for place in places:
+        if not sort_key_gen:
+            sort_key = lambda (p, v): -v
+        else:
+            sort_key = sort_key_gen(place)
+        total = float(sum(confusing_factor[place].values()))
+        normalized[place] = map(
+            lambda x: x[1]/total,
+            sorted(confusing_factor[place].iteritems(), key=sort_key))
+    for place in places:
+        plt.plot(range(len(normalized[place])), normalized[place], **args)
 
 
 def answers_per_user(answers, **args):

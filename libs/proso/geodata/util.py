@@ -32,3 +32,12 @@ def is_list_column(column):
     str_type = type('')
     return reps.apply(lambda x: type(x) == str_type and x.startswith('[') and x.endswith(']')).all()
 
+
+def floyd_warshall(distance_matrix):
+    vertices = distance_matrix.keys()
+    d = dict(distance_matrix) # copy
+    for k in vertices:
+        for i in vertices:
+            for j in vertices:
+                d[i][j] = min(d[i][j], d[i][k] + d[k][j])
+    return d
