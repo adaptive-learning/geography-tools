@@ -18,6 +18,7 @@ def load_csv(csv_file):
 def convert_time(value):
     return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
+
 def str2list(x, convert_item=None):
     s = x.strip('[]').replace(' ', '').split(',')
     if convert_item:
@@ -35,7 +36,7 @@ def is_list_column(column):
 
 def floyd_warshall(distance_matrix):
     vertices = distance_matrix.keys()
-    d = dict(distance_matrix) # copy
+    d = dict(distance_matrix)   # copy
     for k in vertices:
         for i in vertices:
             for j in vertices:

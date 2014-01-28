@@ -21,10 +21,8 @@ def json2dataframe(model_name, json_data):
         if item['model'] != model_name:
             continue
         fields = item['fields']
-        row = {'id' : item['pk']}
+        row = {'id': item['pk']}
         for key, value in fields.iteritems():
             row[key] = value
         data.append(row)
     return pd.DataFrame(data)
-
-

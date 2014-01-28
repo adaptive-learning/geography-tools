@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 def empty_distance_matrix(places, place_type=None):
     dist = {}
     for i, row1 in places.iterrows():

@@ -21,7 +21,7 @@ def confusing_factor(confusing_factor, places=None, sort_key_gen=None, **args):
             sort_key = sort_key_gen(place)
         total = float(sum(confusing_factor[place].values()))
         normalized[place] = map(
-            lambda x: x[1]/total,
+            lambda x: x[1] / total,
             sorted(confusing_factor[place].iteritems(), key=sort_key))
     for place in places:
         plt.plot(range(len(normalized[place])), normalized[place], **args)
