@@ -4,7 +4,6 @@ import common
 
 class Elo:
 
-
     def __init__(self, alpha=1.0, alpha_scale=0.05, beta=1.0, beta_scale=0.05):
         self.alpha = alpha
         self.beta = beta

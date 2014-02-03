@@ -4,7 +4,6 @@ import common
 
 class BKT:
 
-
     def __init__(self, plearn=0.6, slip=0.02, guess=0.04):
         self.plearn = plearn
         self.slip = slip
@@ -34,7 +33,6 @@ class BKT:
 
 
 class Elo:
-
 
     def __init__(self, alpha=2.0):
         self.alpha = alpha
