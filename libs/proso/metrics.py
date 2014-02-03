@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sklearn.metrics import roc_curve, auc as sk_auc
 import math
 import util.ensure
@@ -7,7 +8,7 @@ import numpy as np
 
 def rmse(expected, found):
     util.ensure.same_lengths(expected, found)
-    return math.sqrt(np.mean((np.array(expected) - np.array(found))**2))
+    return math.sqrt(np.mean((np.array(expected) - np.array(found)) ** 2))
 
 
 def logloss(expected, found):

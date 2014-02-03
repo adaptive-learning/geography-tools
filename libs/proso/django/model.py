@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import pandas as pd
-import re
-from datetime import datetime
 
 
 def json2csv(model_name, json_file, csv_file):

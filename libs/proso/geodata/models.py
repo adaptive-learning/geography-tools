@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
+import common
 
 
 def confusing_factor(answers):
@@ -18,3 +19,17 @@ def confusing_factor(answers):
             f_answered[asked] = 1 + f_answered.get(asked, 0)
             cf[answered] = f_answered
     return cf
+
+
+def simulate(model_prior, model_current, answers, **kvargs):
+    expected = []
+    predictions = []
+    prior_knowledge = {}
+    for i, answer in answers.iterrows():
+        prior_k = prior_knowledge.get((answer['user'], answer['place_asked']), -1)
+        if prior_k == -1:
+            prior_k = model_prior(answer, **kvargs)
+            prior_knowledge[answer['user'], answer['place_asked']] = prior_k
+        predictions.append(model_current(answer, prior_k, **kvargs))
+        expected.append(common.correctness(answer))
+    return expected, predictions

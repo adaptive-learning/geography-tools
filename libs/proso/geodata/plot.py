@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
-import sys
 
 
 def confusing_factor_by_distance(cf, distance_matrix, places=None, **kwargs):
