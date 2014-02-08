@@ -4,6 +4,11 @@ import common
 import proso.optimize
 
 
+MODEL_PRIOR = 1
+MODEL_CURRENT = 2
+MODEL_ALL = 3
+
+
 def confusing_factor(answers):
     cf = {}
     for i, row in answers.iterrows():
@@ -32,19 +37,24 @@ def get_prior_knowledge(model_prior, answers, **kvargs):
     return prior_knowledge
 
 
-def simulate_with_prior_knowledge(prior_knowledge, model_current, answers, **kvargs):
+def simulate_with_prior_knowledge(prior_knowledge, model_current, answers, track=MODEL_ALL, **kvargs):
     expected = []
     predictions = []
+    asked = {}
     for i, answer in answers.iterrows():
+        already_asked = asked.get((answer['user'], answer['place_asked']), False)
+        asked[answer['user'], answer['place_asked']] = True
         prior_k = prior_knowledge[answer['user'], answer['place_asked']]
-        predictions.append(model_current(answer, prior_k, **kvargs))
-        expected.append(common.correctness(answer))
+        p = model_current(answer, prior_k, **kvargs)
+        if already_asked or track != MODEL_CURRENT:
+            predictions.append(p)
+            expected.append(common.correctness(answer))
     return expected, predictions
 
 
-def simulate(model_prior, model_current, answers, **kvargs):
+def simulate(model_prior, model_current, answers, track=MODEL_ALL, **kvargs):
     prior_knowledge = get_prior_knowledge(model_prior, answers, **kvargs)
-    return simulate_with_prior_knowledge(prior_knowledge, model_current, answers, **kvargs)
+    return simulate_with_prior_knowledge(prior_knowledge, model_current, answers, track=track, **kvargs)
 
 
 def optimize_current(model_prior, model_current_constructor, metric, answers, *init_params, **kvargs):
