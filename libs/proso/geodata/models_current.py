@@ -75,7 +75,7 @@ class PFA:
 
 class PFAElo:
 
-    def __init__(self, good=3.0, bad=-0.2, time_shift=80.0):
+    def __init__(self, good=3.5, bad=-0.06, time_shift=80.0):
         self.good = good
         self.bad = bad
         self.time_shift = time_shift
