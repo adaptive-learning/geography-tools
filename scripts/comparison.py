@@ -42,7 +42,7 @@ for model in MODELS_CURRENT:
         prior_knowledge,
         model_instance.model,
         answers,
-        track=proso.geodata.models.MODEL_ALL)
+        track=proso.geodata.models.MODEL_CURRENT)
     for metric in METRICS:
         error = round(metric(expected, predicted) * 1000) / 1000.0
         print error, "\t",
