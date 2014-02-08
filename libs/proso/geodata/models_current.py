@@ -5,7 +5,7 @@ import datetime
 
 class BKT:
 
-    def __init__(self, plearn=0.6, slip=0.02, guess=0.04):
+    def __init__(self, plearn=0.6, slip=0.1, guess=0.04):
         self.plearn = plearn
         self.slip = slip
         self.default_guess = guess
