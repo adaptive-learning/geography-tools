@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import common
+import datetime
 
 
 class BKT:
@@ -34,32 +35,43 @@ class BKT:
 
 class Elo:
 
-    def __init__(self, alpha=2.0):
+
+    def __init__(self, alpha=2.0, time_shift=160.0):
         self.alpha = alpha
+        self.time_shift = time_shift
         self.skills = {}
+        self.times = {}
 
     def model(self, answer, prior_skill, **kvargs):
+        last_time = self.times.get((answer['user'], answer['place_asked']), common.UNIX_EPOCH)
         skill = self.skills.get((answer['user'], answer['place_asked']), prior_skill)
+        skill_shift = skill + self.time_shift / (1 + (answer['inserted'] - last_time).total_seconds())
         pred = common.sigmoid_shift(
-            skill,
+            skill_shift,
             common.random_factor(answer))
         self.skills[answer['user'], answer['place_asked']] = skill + (common.correctness(answer) - pred) * self.alpha
+        self.times[answer['user'], answer['place_asked']] = answer['inserted']
         return pred
 
 
 class PFA:
 
-    def __init__(self, good=0.8, bad=0.2):
+    def __init__(self, good=0.8, bad=0.2, time_shift=60.0):
         self.good = good
         self.bad = bad
+        self.time_shift = time_shift
         self.skills = {}
+        self.times = {}
 
     def model(self, answer, prior_skill, **kvargs):
+        last_time = self.times.get((answer['user'], answer['place_asked']), common.UNIX_EPOCH)
         skill = self.skills.get((answer['user'], answer['place_asked']), prior_skill)
+        skill_shift = skill + self.time_shift / (1 + (answer['inserted'] - last_time).total_seconds())
         if common.correctness(answer):
             self.skills[answer['user'], answer['place_asked']] = skill + self.good
         else:
             self.skills[answer['user'], answer['place_asked']] = skill + self.bad
+        self.times[answer['user'], answer['place_asked']] = answer['inserted']
         return common.sigmoid_shift(
-            skill,
+            skill_shift,
             common.random_factor(answer))
