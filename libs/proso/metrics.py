@@ -10,7 +10,7 @@ def rmse(expected, found):
     util.ensure.same_lengths(expected, found)
     return math.sqrt(np.mean((np.array(expected) - np.array(found)) ** 2))
 
-def rmse_binary_weighted(expected, found):
+def rmse_bw(expected, found):
     util.ensure.same_lengths(expected, found)
     ones = sum(expected) / float(len(expected))
     zeros = 1 - ones
