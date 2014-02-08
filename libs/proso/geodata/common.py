@@ -2,6 +2,13 @@
 import math
 
 
+def normed_prob_diff(expected, given):
+    diff = expected - given
+    sign = 1 if diff > 0 else -1
+    normed_diff = abs(diff) / abs(expected - 0.5 + sign * 0.5)
+    return normed_diff
+
+
 def counter(key, counter_dict):
     count = counter_dict.get(key, 0)
     counter_dict[key] = count + 1
