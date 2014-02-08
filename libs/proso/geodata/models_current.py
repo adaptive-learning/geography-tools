@@ -26,10 +26,6 @@ class BKT:
         else:
             P_u = P * self.slip / (P * self.slip + (1 - P) * (1 - self.guess(answer)))
         self.local[answer['user'], answer['place_asked']] = P_u + (1 - P_u) * self.plearn
-        if self.local[answer['user'], answer['place_asked']] > 1.0:
-            from pprint import pprint
-            pprint(answer)
-            print P, "---->", P_u + (1 - P_u) * self.plearn
         return P
 
 
