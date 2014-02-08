@@ -21,6 +21,7 @@ class BKT:
         P = self.local.get(
             (answer['user'], answer['place_asked']),
             common.sigmoid(prior_skill))
+        P = P * (1 - self.slip) + (1 - P) * self.guess(answer)
         if common.correctness(answer):
             P_u = P * (1 - self.slip) / (P * (1 - self.slip) + (1 - P) * self.guess(answer))
         else:
