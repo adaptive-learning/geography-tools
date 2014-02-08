@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import math
+import datetime
+
+
+UNIX_EPOCH = datetime.datetime(1970, 1, 1, 0, 0)
 
 
 def normed_prob_diff(expected, given):
