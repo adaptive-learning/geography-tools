@@ -75,3 +75,27 @@ class PFA:
         return common.sigmoid_shift(
             skill_shift,
             common.random_factor(answer))
+
+
+class PFAElo:
+
+    def __init__(self, good=3.0, bad=-0.2, time_shift=80.0):
+        self.good = good
+        self.bad = bad
+        self.time_shift = time_shift
+        self.skills = {}
+        self.times = {}
+
+    def model(self, answer, prior_skill, **kvargs):
+        last_time = self.times.get((answer['user'], answer['place_asked']), common.UNIX_EPOCH)
+        skill = self.skills.get((answer['user'], answer['place_asked']), prior_skill)
+        skill_shift = skill + self.time_shift / (1 + (answer['inserted'] - last_time).total_seconds())
+        pred = common.sigmoid_shift(
+            skill_shift,
+            common.random_factor(answer))
+        if common.correctness(answer):
+            self.skills[answer['user'], answer['place_asked']] = skill + self.good * (1 - pred)
+        else:
+            self.skills[answer['user'], answer['place_asked']] = skill + self.bad
+        self.times[answer['user'], answer['place_asked']] = answer['inserted']
+        return pred
