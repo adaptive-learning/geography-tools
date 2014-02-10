@@ -21,6 +21,7 @@ METRICS = [
     proso.metrics.rmse,
     proso.metrics.mae,
     proso.metrics.auc,
+    proso.metrics.logloss
 ]
 
 answers = proso.geodata.load_csv(TARGET + "/data/geography.answer.csv");

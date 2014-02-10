@@ -23,7 +23,7 @@ def logloss(expected, found):
     util.ensure.same_lengths(expected, found)
     epsilon = 1e-15
     found = sp.minimum(1 - epsilon, sp.maximum(epsilon, found))
-    ll = sum(expected * sp.log(found) + sp.subtract(1, expected * sp.log(sp.subtract(1, found))))
+    ll = sum(expected * sp.log(found) + sp.subtract(1, expected) * sp.log(sp.subtract(1, found)))
     return ll * -1.0 / len(expected)
 
 
