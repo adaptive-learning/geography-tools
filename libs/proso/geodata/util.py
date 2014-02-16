@@ -3,6 +3,22 @@ from datetime import datetime
 import pandas as pd
 
 
+def normalize_by(answers, by):
+    means = answers.groupby(by)['response_time'].mean()
+    stds = answers.groupby(by)['response_time'].std()
+    means_dict = {}
+    for p, t in means.iteritems():
+        means_dict[p] = {}
+        means_dict[p]['mean'] = t
+    for p, t in stds.iteritems():
+        means_dict[p]['std'] = t
+    rows = []
+    for i, row in answers.iterrows():
+        row['response_time'] = (row['response_time'] - means_dict[row[by]]['mean']) / means_dict[row[by]]['std']
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def load_csv(csv_file):
     data = pd.DataFrame.from_csv(csv_file, index_col=False)
     for column in data.columns:
